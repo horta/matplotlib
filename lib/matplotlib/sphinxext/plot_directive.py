@@ -299,12 +299,17 @@ def unescape_doctest(text):
     Extract code from a piece of text, which contains either Python code
     or doctests.
     """
+    import doctest
+
     if not contains_doctest(text):
         return text
 
+    marker = re.escape(doctest.ELLIPSIS_MARKER)
+    expr = re.compile(r'^\s*(>>>|{}) (.*)$'.format(marker))
+
     code = ""
     for line in text.split("\n"):
-        m = re.match(r'^\s*(>>>|\.\.\.) (.*)$', line)
+        m = re.match(expr, line)
         if m:
             code += m.group(2) + "\n"
         elif line.strip():
